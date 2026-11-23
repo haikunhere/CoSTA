@@ -1,0 +1,38 @@
+defaults:
+  - sft_trainer_engine
+  - _self_
+hydra:
+  run:
+    dir: ${oc.env:SFT_OUTPUT}/hydra
+model:
+  path: ${oc.env:SFT_MODEL}
+engine:
+  strategy: fsdp2
+  use_torch_compile: false
+  reshard_after_forward: false
+  forward_prefetch: true
+optim:
+  lr: 2.0e-6
+  lr_scheduler_type: cosine
+  lr_warmup_steps_ratio: 0.03
+data:
+  train_files: ${oc.env:SFT_DATA}
+  custom_cls:
+    path: pkg://training.train_sft
+    name: SFTDataset
+  train_batch_size: 32
+  max_length: 32768
+  max_token_len_per_gpu: 65536
+  micro_batch_size_per_gpu: 1
+  num_workers: 0
+checkpoint:
+  save_contents: [hf_model]
+trainer:
+  n_gpus_per_node: 4
+  total_epochs: 1
+  logger: [console, file]
+  project_name: costa
+  experiment_name: sft
+  default_local_dir: ${oc.env:SFT_OUTPUT}/checkpoints
+  resume_mode: disable
+  max_ckpt_to_keep: 1

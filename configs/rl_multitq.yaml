@@ -1,0 +1,4 @@
+costa:
+  questions_per_batch: 64
+  questions_per_mini: 32
+  teams_per_question: 3
